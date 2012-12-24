@@ -86,7 +86,7 @@
 	
 	{
 		UIImage *knobTmpImage = [[[UIImage imageNamed:@"btn_slider_thumb.png"] retain] autorelease];
-		UIImage *knobImageStretch = [knobTmpImage stretchableImageWithLeftCapWidth:12.0
+		UIImage *knobImageStretch = [knobTmpImage stretchableImageWithLeftCapWidth:endcapWidth
 																	  topCapHeight:0.0];
 		CGRect knobRect = CGRectMake(0, 0, knobWidth, [knobImageStretch size].height);
 
@@ -98,12 +98,12 @@
 		[knobImageStretch drawInRect:knobRect];
 		[knobImage release];
 		knobImage = [UIGraphicsGetImageFromCurrentImageContext() retain];
-		UIGraphicsEndImageContext();	
+		UIGraphicsEndImageContext();
 	}
 	
 	{
 		UIImage *knobTmpImage = [[[UIImage imageNamed:@"btn_slider_thumb_pressed.png"] retain] autorelease];
-		UIImage *knobImageStretch = [knobTmpImage stretchableImageWithLeftCapWidth:12.0
+		UIImage *knobImageStretch = [knobTmpImage stretchableImageWithLeftCapWidth:endcapWidth
 																	  topCapHeight:0.0];
 		CGRect knobRect = CGRectMake(0, 0, knobWidth, [knobImageStretch size].height);
 		if(UIGraphicsBeginImageContextWithOptions != NULL)
@@ -221,23 +221,24 @@
 	}
 	
 	CGContextRef context = UIGraphicsGetCurrentContext();
+    CGFloat thumbVerticalOffset = 4;
 	
 	{
 		CGContextSaveGState(context);
 		UIGraphicsPushContext(context);
 		
-		if(drawPercent == 0.0){
-			CGRect insetClipRect = boundsRect;
-			insetClipRect.origin.x += endcapWidth;
-			insetClipRect.size.width -= endcapWidth;
-			UIRectClip(insetClipRect);
-		}
-		
-		if(drawPercent == 1.0){
-			CGRect insetClipRect = boundsRect;
-			insetClipRect.size.width -= endcapWidth;
-			UIRectClip(insetClipRect);
-		}
+//		if(drawPercent == 0.0){
+//			CGRect insetClipRect = boundsRect;
+//			insetClipRect.origin.x += endcapWidth;
+//			insetClipRect.size.width -= endcapWidth;
+//			UIRectClip(insetClipRect);
+//		}
+//		
+//		if(drawPercent == 1.0){
+//			CGRect insetClipRect = boundsRect;
+//			insetClipRect.size.width -= endcapWidth;
+//			UIRectClip(insetClipRect);
+//		}
 		
 		{
 			CGRect sliderOffRect = boundsRect;
@@ -252,7 +253,7 @@
 			CGImageRef sliderOnSubImage = CGImageCreateWithImageInRect([sliderOn CGImage], sourceRect);
 			CGContextSaveGState(context);
 			CGContextScaleCTM(context, 1.0, -1.0);
-			CGContextTranslateCTM(context, 0.0, -drawOnRect.size.height);	
+			CGContextTranslateCTM(context, 0.0, -drawOnRect.size.height);
 			CGContextDrawImage(context, drawOnRect, sliderOnSubImage);
 			CGContextRestoreGState(context);
             
@@ -279,8 +280,9 @@
 			if(self.highlighted)
 				imageToDraw = knobImagePressed;
 			
-			CGRect drawOnRect = CGRectMake(location.x - 1 + roundf(drawPercent * (boundsRect.size.width - knobWidth + 2)),
-										   location.y + 1, knobWidth, [knobImage size].height);
+            CGFloat thumbHorizontalInset = 3;
+			CGRect drawOnRect = CGRectMake(location.x + thumbHorizontalInset + roundf(drawPercent * (boundsRect.size.width - knobWidth - 2 * thumbHorizontalInset)),
+										   location.y + thumbVerticalOffset, knobWidth, [knobImage size].height);
 			CGContextDrawImage(context, drawOnRect, [imageToDraw CGImage]);
 		}
 		UIGraphicsPopContext();
@@ -296,25 +298,25 @@
 		if(self.highlighted)
 			buttonTrackDrawImage = buttonEndTrackPressed;
 		
-		if(drawPercent == 0.0){
-			CGRect sourceRect = CGRectMake(0, 0.0, floorf(endcapWidth * scale), [buttonTrackDrawImage size].height * scale);
-			CGRect drawOnRect = CGRectMake(0, 0.0, floorf(endcapWidth), [buttonTrackDrawImage size].height);
-			CGImageRef buttonTrackSubImage = CGImageCreateWithImageInRect([buttonTrackDrawImage CGImage], sourceRect);
-            CGRect drawIntoRect = drawOnRect;
-            drawIntoRect.origin.y = 1;
-			CGContextDrawImage(context, drawIntoRect, buttonTrackSubImage);
-			CGImageRelease(buttonTrackSubImage);		
-		}
+//		if(drawPercent == 0.0){
+//			CGRect sourceRect = CGRectMake(0, 0.0, floorf(endcapWidth * scale), [buttonTrackDrawImage size].height * scale);
+//			CGRect drawOnRect = CGRectMake(0, 0.0, floorf(endcapWidth), [buttonTrackDrawImage size].height);
+//			CGImageRef buttonTrackSubImage = CGImageCreateWithImageInRect([buttonTrackDrawImage CGImage], sourceRect);
+//            CGRect drawIntoRect = drawOnRect;
+//            drawIntoRect.origin.y = thumbVerticalOffset;
+//			CGContextDrawImage(context, drawIntoRect, buttonTrackSubImage);
+//			CGImageRelease(buttonTrackSubImage);		
+//		}
 		
-		if(drawPercent == 1.0){
-			CGRect sourceRect = CGRectMake(([buttonTrackDrawImage size].width - endcapWidth) * scale, 0.0, endcapWidth * scale, [buttonTrackDrawImage size].height * scale);
-			CGRect drawOnRect = CGRectMake(boundsRect.size.width - ceilf(endcapWidth), 0.0, ceilf(endcapWidth), [buttonTrackDrawImage size].height);
-			CGImageRef buttonTrackSubImage = CGImageCreateWithImageInRect([buttonTrackDrawImage CGImage], sourceRect);
-            CGRect drawIntoRect = drawOnRect;
-            drawIntoRect.origin.y = 1;
-			CGContextDrawImage(context, drawIntoRect, buttonTrackSubImage);
-			CGImageRelease(buttonTrackSubImage);
-		}
+//		if(drawPercent == 1.0){
+//			CGRect sourceRect = CGRectMake(([buttonTrackDrawImage size].width - endcapWidth) * scale, 0.0, endcapWidth * scale, [buttonTrackDrawImage size].height * scale);
+//			CGRect drawOnRect = CGRectMake(boundsRect.size.width - ceilf(endcapWidth), 0.0, ceilf(endcapWidth), [buttonTrackDrawImage size].height);
+//			CGImageRef buttonTrackSubImage = CGImageCreateWithImageInRect([buttonTrackDrawImage CGImage], sourceRect);
+//            CGRect drawIntoRect = drawOnRect;
+//            drawIntoRect.origin.y = thumbVerticalOffset;
+//			CGContextDrawImage(context, drawIntoRect, buttonTrackSubImage);
+//			CGImageRelease(buttonTrackSubImage);
+//		}
 		
 		CGContextRestoreGState(context);
 	}	
